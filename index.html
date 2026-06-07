@@ -210,23 +210,31 @@ function ren(s){
 
 hamta();
 
-// Skicka höjd till föräldrasidan (för iframe auto-höjd)
+// Auto-höjd: sätt html/body till full höjd och meddela föräldrasidan
 function skickaHojd() {
-  var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-  window.parent.postMessage({ type: 'lf-height', height: h + 40 }, '*');
+  var h = document.getElementById('lf-root').scrollHeight + 80;
+  // Metod 1: postMessage till föräldrasidan
+  try { window.parent.postMessage({ type: 'lf-height', height: h }, '*'); } catch(e) {}
+  // Metod 2: sätt iframens höjd direkt via frameElement
+  try { if (window.frameElement) window.frameElement.style.height = h + 'px'; } catch(e) {}
 }
 
-// Skicka höjd när data laddats och när fönstret ändras
 var _origRen = ren;
 ren = function(s) {
   _origRen(s);
   setTimeout(skickaHojd, 100);
   setTimeout(skickaHojd, 500);
-  setTimeout(skickaHojd, 1000);
+  setTimeout(skickaHojd, 1500);
 };
-window.addEventListener('resize', skickaHojd);
-setTimeout(skickaHojd, 300);
-setTimeout(skickaHojd, 1000);
+
+// ResizeObserver för automatisk uppdatering när innehållet ändras
+if (typeof ResizeObserver !== 'undefined') {
+  var ro = new ResizeObserver(function() { skickaHojd(); });
+  ro.observe(document.getElementById('lf-root'));
+}
+
+window.addEventListener('resize', function() { setTimeout(skickaHojd, 200); });
+setTimeout(skickaHojd, 500);
 setTimeout(skickaHojd, 2000);
 
 })();
