@@ -13,7 +13,7 @@
   --serif:'Cormorant Garamond',Georgia,serif;
   --sans:'Jost','Trebuchet MS',sans-serif;
 }
-body{font-family:var(--sans);color:var(--deep);background:transparent;padding:0 0 48px;}
+body{font-family:var(--sans);color:var(--deep);background:transparent;padding:16px 20px 48px;}
 .lf-section{margin-top:48px;}
 .lf-section:first-child{margin-top:0;}
 .lf-section-header{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;border-bottom:1px solid var(--warm);padding-bottom:10px;}
@@ -212,15 +212,22 @@ hamta();
 
 // Skicka höjd till föräldrasidan (för iframe auto-höjd)
 function skickaHojd() {
-  var h = document.body.scrollHeight;
-  window.parent.postMessage({ type: 'lf-height', height: h }, '*');
+  var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+  window.parent.postMessage({ type: 'lf-height', height: h + 40 }, '*');
 }
 
 // Skicka höjd när data laddats och när fönstret ändras
 var _origRen = ren;
-ren = function(s) { _origRen(s); setTimeout(skickaHojd, 50); };
+ren = function(s) {
+  _origRen(s);
+  setTimeout(skickaHojd, 100);
+  setTimeout(skickaHojd, 500);
+  setTimeout(skickaHojd, 1000);
+};
 window.addEventListener('resize', skickaHojd);
-setTimeout(skickaHojd, 500);
+setTimeout(skickaHojd, 300);
+setTimeout(skickaHojd, 1000);
+setTimeout(skickaHojd, 2000);
 
 })();
 </script>
